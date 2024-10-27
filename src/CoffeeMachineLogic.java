@@ -230,7 +230,7 @@ public class CoffeeMachineLogic {
 
     private void takeMoney() {
         coffeeMachineData.takeMoney();
-        addToLogWithNoWriteData(ui.iGaveYou$());
+        addToLogWithNoWriteData(ui.iGaveYouMoney());
         CoffeeResource.money -= CoffeeResource.money;
         writeDataToFile();
     }

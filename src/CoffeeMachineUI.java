@@ -128,8 +128,8 @@ public class CoffeeMachineUI {
         System.out.println("Unknown coffee type.");
     }
 
-    public String iGaveYou$(){
-        String string = "I gave you $" +  + CoffeeResource.money;
+    public String iGaveYouMoney(){
+        String string = "I gave you $" + CoffeeResource.money;
         System.out.println(string);
         return  string;
     }
