@@ -5,7 +5,9 @@ import java.nio.file.Paths;
 
 public class CoffeeMachineData {
 
-    private final CoffeeMachineUI ui = new CoffeeMachineUI();
+    private final CoffeeType coffeeType = new CoffeeType();
+    CoffeeResource resource = new CoffeeResource();
+
     private final String pathAndFileName = "C://JAVA_PROJECTS/coffee_machine_status.txt";
     private String adminUser = "admin";
     private String adminPass = "admin123";
@@ -23,14 +25,13 @@ public class CoffeeMachineData {
     private int totalTimesMoneyTaken = 0;
     private int totalLoginSuccess = 0;
     private int totalLoginFails = 0;
-    private final CoffeeType coffeeType = new CoffeeType();
 
     public CoffeeMachineData() {
-
+        // Load data from file
         try {
             readFileAsString();
         } catch (IOException e) {
-            ui.cannotReadFile(e.getMessage());
+            System.out.println("Cannot read file: " + e.getMessage());
         }
     }
 
@@ -43,18 +44,19 @@ public class CoffeeMachineData {
         if (Files.exists(path)) {
             try {
                 dataFromFile = new String(Files.readAllBytes(path));
-                ui.fileContentLoadedSuccessfully();
+                System.out.println("File content loaded successfully!");
 
                 parseLoadedStringData(dataFromFile);
 
             } catch (IOException e) {
-                ui.errorReadingFile(e.getMessage());
+                System.out.println("Error reading file: " + e.getMessage());
             }
         } else {
-            ui.fileDoesNotExist(pathAndFileName);
+            System.out.println("File does not exist at: " + pathAndFileName);
         }
     }
 
+    // Parse data to program variables
     private void parseLoadedStringData(String dataFromFile) {
         // Split content by lines
         String[] lines = dataFromFile.split("\n");
@@ -63,11 +65,11 @@ public class CoffeeMachineData {
         String[] resourceValues = lines[0].trim().split("; ");
 
         // Load to values to program variables
-        CoffeeResource.water = Integer.parseInt(resourceValues[0]);
-        CoffeeResource.milk = Integer.parseInt(resourceValues[1]);
-        CoffeeResource.beans = Integer.parseInt(resourceValues[2]);
-        CoffeeResource.cups = Integer.parseInt(resourceValues[3]);
-        CoffeeResource.money = Integer.parseInt(resourceValues[4]);
+        resource.setWater(Integer.parseInt(resourceValues[0]));
+        resource.setMilk(Integer.parseInt(resourceValues[1]));
+        resource.setBeans(Integer.parseInt(resourceValues[2]));
+        resource.setCups(Integer.parseInt(resourceValues[3]));
+        resource.setMoney(Integer.parseInt(resourceValues[4]));
 
         // Parse the second line for admin credentials
         String[] adminCredentials = lines[1].trim().split("; ");
@@ -147,7 +149,7 @@ public class CoffeeMachineData {
 
     public void takeMoney() {
         totalTimesMoneyTaken++;
-        totalMoneyTaken += CoffeeResource.money;
+        totalMoneyTaken += resource.getMoney();
     }
 
     public void loginSuccess() {
