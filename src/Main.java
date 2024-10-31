@@ -1,5 +1,7 @@
 public class Main {
     public static void main(String[] args) {
-        CoffeeMachineLogic coffeeMachineLogic = new CoffeeMachineLogic();
+
+        CoffeeMachineUI ui = new CoffeeMachineUI();
+        ui.runCoffeeMachine();
     }
 }
