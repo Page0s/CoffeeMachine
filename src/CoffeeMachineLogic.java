@@ -1,147 +1,55 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class CoffeeMachineLogic {
 
-    private final CoffeeMachineUI ui = new CoffeeMachineUI();
     private final CoffeeType coffeeType = new CoffeeType();
-    private CoffeeMachineData coffeeMachineData;
+    private CoffeeMachineData data;
     private int coffeeCupsSold = 0;
 
     public CoffeeMachineLogic() {
-        startCoffeeMachine();
+        loadDataFromFile();
     }
 
-    private void startCoffeeMachine() {
-
-        boolean running = true;
-
+    public void loadDataFromFile() {
         // Load data from a file
-        coffeeMachineData = new CoffeeMachineData();
-
-        // Run Coffee Machine until user exits the program
-        while (running) {
-            if (!isCoffeeMachineRunning()) {
-                running = false;
-                // save data to a file
-                writeDataToFile();
-            }
-        }
+        data = new CoffeeMachineData();
     }
 
-    private void writeDataToFile() {
+    public void writeDataToFile() {
 
-        File file = new File(coffeeMachineData.getPathAndFileName());
+        File file = new File(data.getPathAndFileName());
 
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write(CoffeeResource.water + "; " +
-                    CoffeeResource.milk + "; " +
-                    CoffeeResource.beans + "; " +
-                    CoffeeResource.cups + "; " +
-                    CoffeeResource.money + "\n" +
-                    coffeeMachineData.getAdminUser() + "; " +
-                    coffeeMachineData.getAdminPass() + "\n" +
-                    coffeeMachineData.writeDataFormat() +
-                    coffeeMachineData.getSystemLog());
+            writer.write(getWater() + "; " +
+                    getMilk() + "; " +
+                    getBeans() + "; " +
+                    getCups() + "; " +
+                    getMoney() + "\n" +
+                    data.getAdminUser() + "; " +
+                    data.getAdminPass() + "\n" +
+                    data.writeDataFormat() +
+                    data.getSystemLog());
         } catch (IOException e) {
-            ui.anExceptionOccurred(e.getMessage());
+            System.out.println("An exception occurred " + e.getMessage());
         }
     }
 
-    public boolean isCoffeeMachineRunning() {
-        // Display menu, get user input
-        ui.displayMenu();
-        String userInput = ui.getUserChoice();
-
-        switch (userInput) {
-            case "buy" -> buyCoffee();
-            case "login" -> adminLogin();
-            case "exit" -> {
-                return false;
-            }
-            default -> ui.wringInput();
-        }
-
-        return true;
-    }
-
-    private void adminLogin() {
-        // loop until user exit
-        boolean running = true;
-        String user = ui.getUsername();
-        String pass = ui.getPassword();
-        if (!user.equals(coffeeMachineData.getAdminUser()) || !pass.equals(coffeeMachineData.getAdminPass())) {
-            coffeeMachineData.loginFail();
-            ui.wrongUserOrPass();
-        } else {
-            coffeeMachineData.loginSuccess();
-            ui.loginSuccess();
-            do {
-                // Display menu, get user input
-                ui.displayAdminMenu();
-                String userInput = ui.getUserChoice();
-
-                switch (userInput) {
-                    case "fill" -> fillStorage();
-                    case "take" -> takeMoney();
-                    case "remaining" -> ui.showStorage();
-                    case "log" -> showLog();
-                    case "exit" -> {
-                        running = false;
-                    }
-                    default -> ui.wringInput();
-                }
-            } while (running);
-        }
-    }
-
-    private void showLog() {
-        ui.writeMessage(coffeeMachineData.getSystemLog());
-        ui.writeMessage(coffeeMachineData.toString());
-    }
-
-    private void buyCoffee() {
-        // Sell coffee until need cleaning
-        if (coffeeCupsSold < 10) {
-            boolean isUserInputTrue = true;
-            String userInput;
-
-            // loop until user input correct
-            do {
-                ui.displayWhatTypeYouBuy();
-                userInput = ui.getUserChoice();
-                if (userInput.equals("1") || userInput.equals("2") || userInput.equals("3") || userInput.equals("back")) {
-                    isUserInputTrue = false;
-                } else {
-                    ui.wringInput();
-                }
-            } while (isUserInputTrue);
-
-            // make coffee or write what is missing
-            switch (userInput) {
-                case "1" -> makeCoffeeType(coffeeType.getEspresso());
-                case "2" -> makeCoffeeType(coffeeType.getLatte());
-                case "3" -> makeCoffeeType(coffeeType.getCappuccino());
-            }
-        } else {
-            addToLog(ui.iNeedCleaning());
-            clean();
-        }
-    }
-
-    private void clean() {
+    public void clean(String iAmClean) {
         coffeeCupsSold = 0;
-        coffeeMachineData.cleanedMachine();
-        addToLog(ui.iAmClean());
+        data.cleanedMachine();
+        addToLog(iAmClean);
     }
 
-    private void makeCoffeeType(CoffeeType coffeeType) {
+    public String makeCoffeeType(CoffeeType coffeeType) {
 
-        int sellAmountWater = CoffeeResource.water / coffeeType.water;
-        int sellAmountMilk = CoffeeResource.milk / coffeeType.milk;
-        int sellAmountBeans = CoffeeResource.beans / coffeeType.beans;
-        int sellAmountCups = CoffeeResource.cups / coffeeType.cup;
+        int sellAmountWater = data.resource.getWater() / coffeeType.water;
+        int sellAmountMilk = data.resource.getMilk() / coffeeType.milk;
+        int sellAmountBeans = data.resource.getBeans() / coffeeType.beans;
+        int sellAmountCups = data.resource.getCups() / coffeeType.cup;
 
         int amountCoffeeToSell;
 
@@ -177,116 +85,166 @@ public class CoffeeMachineLogic {
         // make coffee and reduce the storage
         if (amountCoffeeToSell > 0) {
             // reduce storage
-            CoffeeResource.water -= coffeeType.water;
-            CoffeeResource.milk -= coffeeType.milk;
-            CoffeeResource.beans -= coffeeType.beans;
-            CoffeeResource.money += coffeeType.cost;
-            CoffeeResource.cups -= coffeeType.cup;
+            data.resource.setWater(data.resource.getWater() - coffeeType.water);
+            data.resource.setMilk(data.resource.getMilk() - coffeeType.milk);
+            data.resource.setBeans(data.resource.getBeans() - coffeeType.beans);
+            data.resource.setMoney(data.resource.getMoney() + coffeeType.cost);
+            data.resource.setCups(data.resource.getCups() - coffeeType.cup);
 
             coffeeCupsSold++;
-            coffeeMachineData.totalCoffeeCupsSold();
+            data.totalCoffeeCupsSold();
             switch (coffeeType.name) {
                 case "espresso" -> {
-                    coffeeMachineData.espressoSold();
-                    addToLog(ui.makingYouEspresso());
+                    data.espressoSold();
+                    String espresso = "I have enough resources, making you espresso";
+                    addToLog(espresso);
+                    return espresso;
                 }
                 case "latte" -> {
-                    coffeeMachineData.latteSold();
-                    addToLog(ui.makingYouLatte());
+                    data.latteSold();
+                    String latte = "I have enough resources, making you latte";
+                    addToLog(latte);
+                    return latte;
                 }
                 case "cappuccino" -> {
-                    coffeeMachineData.cappuccinoSold();
-                    addToLog(ui.makingYouCappuccino());
+                    data.cappuccinoSold();
+                    String cappuccino = "I have enough resources, making you cappuccino";
+                    addToLog(cappuccino);
+                    return cappuccino;
                 }
-                default -> ui.unknownCoffeeType();
+                default -> {
+                    String unknown = "Unknown coffee type.";
+                    addToLog(unknown);
+                    return unknown;
+                }
             }
 
         } else {
             if (sellAmountWater < 1) {
-                ui.sorryNotEnoughWater();
+                String noWater = "Sorry, not enough water!";
+                addToLog(noWater);
+                return noWater;
             }
             if (sellAmountMilk < 1) {
-                ui.sorryNotEnoughMilk();
+                String noMilk = "Sorry, not enough milk!";
+                addToLog(noMilk);
+                return noMilk;
             }
             if (sellAmountBeans < 1) {
-                ui.sorryNotEnoughBeans();
+                String noBeans = "Sorry, not enough coffee beans!";
+                addToLog(noBeans);
+                return noBeans;
             }
             if (sellAmountCups < 1) {
-                ui.sorryNotEnoughCups();
+                String noCups = "Sorry, not enough cups!";
+                addToLog(noCups);
+                return noCups;
             }
         }
+        return null;
     }
 
-    private void addToLog(String nextLine) {
-        String systemLog = coffeeMachineData.getSystemLog() + ("\n" + nextLine);
-        coffeeMachineData.setSystemLog(systemLog);
+    public void addToLog(String nextLine) {
+        String formatedDate = getTimeFormat();
+        String systemLog = data.getSystemLog() + ("\n" + formatedDate + ": " + nextLine);
+        data.setSystemLog(systemLog);
         writeDataToFile();
     }
 
-    private void addToLogWithNoWriteData(String nextLine) {
-        String systemLog = coffeeMachineData.getSystemLog() + ("\n" + nextLine);
-        coffeeMachineData.setSystemLog(systemLog);
+    public void addToLogWithNoWriteData(String nextLine) {
+        String formatedDate = getTimeFormat();
+        String systemLog = data.getSystemLog() + ("\n" + formatedDate + ": " + nextLine);
+        data.setSystemLog(systemLog);
     }
 
-    private void takeMoney() {
-        coffeeMachineData.takeMoney();
-        addToLogWithNoWriteData(ui.iGaveYouMoney());
-        CoffeeResource.money -= CoffeeResource.money;
+    private String getTimeFormat(){
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return currentDateTime.format(formatter);
+    }
+
+    public void takeMoney(String iGaveYouMoney) {
+        data.takeMoney();
+        addToLogWithNoWriteData(iGaveYouMoney);
+        data.resource.setMoney(0);
         writeDataToFile();
     }
 
-    private void fillStorage() {
-
-        int waterAmount = checkUserInput(IngredientType.WATER);
-        CoffeeResource.water += waterAmount;
-        addToLog(waterAmount + ui.fill() + IngredientType.WATER);
-
-        int milkAmount = checkUserInput(IngredientType.MILK);
-        CoffeeResource.milk += milkAmount;
-        addToLog(milkAmount + ui.fill() + IngredientType.MILK);
-
-        int beansAmount = checkUserInput(IngredientType.BEANS);
-        CoffeeResource.beans += beansAmount;
-        addToLog(beansAmount + ui.fill() + IngredientType.BEANS);
-
-        int cups = checkUserInput(IngredientType.CUPS);
-        CoffeeResource.cups += cups;
-        addToLog(cups + ui.fill() + IngredientType.CUPS);
-
-        writeDataToFile();
+    public int getWater() {
+        return data.resource.getWater();
     }
 
-    private int checkUserInput(IngredientType ingredientType) {
-        int amount = 0;
-        boolean noInteger = true;
-        String userInput;
-
-        do {
-            switch (ingredientType) {
-                case WATER -> userInput = ui.writeHowMuchWater();
-                case MILK -> userInput = ui.writeHowMuchMilk();
-                case BEANS -> userInput = ui.writeHowMuchBeans();
-                case CUPS -> userInput = ui.writeHowMuchCups();
-                default -> userInput = null;
-            }
-            // Check user input
-            if (isInteger(userInput)) {
-                amount = Integer.parseInt(userInput); // Safe to parse since it's valid
-                noInteger = false;
-            } else {
-                addToLog(ui.wrongInputPleaseWriteInteger());
-            }
-        } while (noInteger);
-        return amount;
+    public int getMilk() {
+        return data.resource.getMilk();
     }
 
-    // Method to check if input is a valid integer
-    private boolean isInteger(String input) {
-        try {
-            Integer.parseInt(input); // Try to parse input as an integer
-            return true; // If parsing succeeds, input is a valid integer
-        } catch (NumberFormatException e) {
-            return false; // If an exception is thrown, input is not a valid integer
-        }
+    public int getBeans() {
+        return data.resource.getBeans();
+    }
+
+    public int getCups() {
+        return data.resource.getCups();
+    }
+
+    public int getMoney() {
+        return data.resource.getMoney();
+    }
+
+    public String getAdminUser() {
+        return data.getAdminUser();
+    }
+
+    public String getAdminPass() {
+        return data.getAdminPass();
+    }
+
+    public void loginFail() {
+        data.loginFail();
+    }
+
+    public void loginSuccess() {
+        data.loginSuccess();
+    }
+
+    public String getSystemLog() {
+        return data.getSystemLog();
+    }
+
+    public void addToWater(int waterAmount) {
+        data.resource.setWater(data.resource.getWater() + waterAmount);
+    }
+
+    public void addToMilk(int milkAmount) {
+        data.resource.setMilk(data.resource.getMilk() + milkAmount);
+    }
+
+    public void addToBeans(int beansAmount) {
+        data.resource.setBeans(data.resource.getBeans() + beansAmount);
+    }
+
+    public void addToCups(int cups) {
+        data.resource.setCups(data.resource.getCups() + cups);
+    }
+
+    public boolean isCoffeeMachineClean() {
+        if (coffeeCupsSold < 10)
+            return true;
+        return false;
+    }
+
+    public CoffeeType getEspresso() {
+        return coffeeType.getEspresso();
+    }
+
+    public CoffeeType getLatte() {
+        return coffeeType.getLatte();
+    }
+
+    public CoffeeType getCappuccino() {
+        return coffeeType.getCappuccino();
+    }
+
+    public String showStatistics(){
+        return data.toString();
     }
 }
