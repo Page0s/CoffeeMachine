@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 
 public class CoffeeMachineLogic {
 
-    private final CoffeeType coffeeType = new CoffeeType();
     private CoffeeMachineData data;
     private int coffeeCupsSold = 0;
 
@@ -46,10 +45,10 @@ public class CoffeeMachineLogic {
 
     public String makeCoffeeType(CoffeeType coffeeType) {
 
-        int sellAmountWater = data.resource.getWater() / coffeeType.water;
-        int sellAmountMilk = data.resource.getMilk() / coffeeType.milk;
-        int sellAmountBeans = data.resource.getBeans() / coffeeType.beans;
-        int sellAmountCups = data.resource.getCups() / coffeeType.cup;
+        int sellAmountWater = data.resource.getWater() / coffeeType.getWater();
+        int sellAmountMilk = data.resource.getMilk() / coffeeType.getMilk();
+        int sellAmountBeans = data.resource.getBeans() / coffeeType.getBeans();
+        int sellAmountCups = data.resource.getCups() / coffeeType.getCup();
 
         int amountCoffeeToSell;
 
@@ -57,7 +56,7 @@ public class CoffeeMachineLogic {
         amountCoffeeToSell = sellAmountWater;
 
         // special case espresso
-        if (coffeeType.milk == 1) {
+        if (coffeeType.getMilk() == 1) {
             // Compare with beansCups
             if (sellAmountBeans < amountCoffeeToSell) {
                 amountCoffeeToSell = sellAmountBeans;
@@ -85,15 +84,15 @@ public class CoffeeMachineLogic {
         // make coffee and reduce the storage
         if (amountCoffeeToSell > 0) {
             // reduce storage
-            data.resource.setWater(data.resource.getWater() - coffeeType.water);
-            data.resource.setMilk(data.resource.getMilk() - coffeeType.milk);
-            data.resource.setBeans(data.resource.getBeans() - coffeeType.beans);
-            data.resource.setMoney(data.resource.getMoney() + coffeeType.cost);
-            data.resource.setCups(data.resource.getCups() - coffeeType.cup);
+            data.resource.setWater(data.resource.getWater() - coffeeType.getWater());
+            data.resource.setMilk(data.resource.getMilk() - coffeeType.getMilk());
+            data.resource.setBeans(data.resource.getBeans() - coffeeType.getBeans());
+            data.resource.setMoney(data.resource.getMoney() + coffeeType.getCost());
+            data.resource.setCups(data.resource.getCups() - coffeeType.getCup());
 
             coffeeCupsSold++;
             data.totalCoffeeCupsSold();
-            switch (coffeeType.name) {
+            switch (coffeeType.getName()) {
                 case "espresso" -> {
                     data.espressoSold();
                     String espresso = "I have enough resources, making you espresso";
@@ -230,18 +229,6 @@ public class CoffeeMachineLogic {
         if (coffeeCupsSold < 10)
             return true;
         return false;
-    }
-
-    public CoffeeType getEspresso() {
-        return coffeeType.getEspresso();
-    }
-
-    public CoffeeType getLatte() {
-        return coffeeType.getLatte();
-    }
-
-    public CoffeeType getCappuccino() {
-        return coffeeType.getCappuccino();
     }
 
     public String showStatistics(){
