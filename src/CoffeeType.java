@@ -1,13 +1,11 @@
 public class CoffeeType {
 
-    String name;
-    int water;
-    int milk;
-    int beans;
-    int cost;
-    int cup;
-
-    public CoffeeType() {}
+    private String name;
+    private int water;
+    private int milk;
+    private int beans;
+    private int cost;
+    private int cup;
 
     public CoffeeType(String name, int water, int milk, int beans, int cost, int cup) {
         this.name = name;
@@ -16,18 +14,6 @@ public class CoffeeType {
         this.beans = beans;
         this.cost = cost;
         this.cup = cup;
-    }
-
-    public CoffeeType getEspresso(){
-        return new CoffeeType("espresso", 250, 1, 16, 4, 1);
-    }
-
-    public CoffeeType getLatte(){
-        return new CoffeeType("latte", 350, 75, 20, 7, 1);
-    }
-
-    public CoffeeType getCappuccino(){
-        return new CoffeeType("cappuccino", 200, 100, 12, 6, 1);
     }
 
     public String getName() {
