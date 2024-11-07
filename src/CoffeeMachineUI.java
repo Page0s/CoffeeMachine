@@ -2,6 +2,9 @@ import java.util.Scanner;
 
 public class CoffeeMachineUI {
     private final Scanner scanner = new Scanner(System.in);
+    CoffeeType[] coffeeTypes = {new CoffeeType("espresso", 250, 1, 16, 4, 1),
+            new CoffeeType("latte", 350, 75, 20, 7, 1),
+            new CoffeeType("cappuccino", 200, 100, 12, 6, 1)};
     CoffeeMachineLogic logic;
 
     public CoffeeMachineUI() {
@@ -74,15 +77,15 @@ public class CoffeeMachineUI {
             switch (userInput) {
                 case "1" -> {
                     logic.addToLog("User: " + validUserInput(userInput));
-                    writeMessage(logic.makeCoffeeType(logic.getEspresso()));
+                    writeMessage(logic.makeCoffeeType(coffeeTypes[0]));
                 }
                 case "2" -> {
                     logic.addToLog("User: " + validUserInput(userInput));
-                    writeMessage(logic.makeCoffeeType(logic.getLatte()));
+                    writeMessage(logic.makeCoffeeType(coffeeTypes[1]));
                 }
                 case "3" -> {
                     logic.addToLog("User: " + validUserInput(userInput));
-                    writeMessage(logic.makeCoffeeType(logic.getCappuccino()));
+                    writeMessage(logic.makeCoffeeType(coffeeTypes[2]));
                 }
                 case "back" -> {
                     logic.addToLog("User: " + validUserInput(userInput));
