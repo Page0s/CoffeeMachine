@@ -5,10 +5,13 @@ import java.nio.file.Paths;
 
 public class CoffeeMachineData {
 
-    private final CoffeeType coffeeType = new CoffeeType();
+//    private final CoffeeType coffeeType = new CoffeeType();
+private CoffeeType[] coffeeTypeArray = new CoffeeType[]{new CoffeeType("espresso", 250, 1, 16, 4, 1),
+        new CoffeeType("latte", 350, 75, 20, 7, 1),
+        new CoffeeType("cappuccino", 200, 100, 12, 6, 1)};
     CoffeeResource resource = new CoffeeResource();
 
-    private final String pathAndFileName = "C://JAVA_PROJECTS/coffee_machine_status.txt";
+    private final String pathAndFileName = "doc/coffee_machine_status.txt";
     private String adminUser = "admin";
     private String adminPass = "admin123";
     private String systemLog;
@@ -127,20 +130,20 @@ public class CoffeeMachineData {
 
     public void espressoSold() {
         totalEspressoSold++;
-        totalMoneyEarned += coffeeType.getEspresso().getCost();
-        totalMoneyFromEspresso += coffeeType.getEspresso().getCost();
+        totalMoneyEarned += coffeeTypeArray[0].getCost();
+        totalMoneyFromEspresso += coffeeTypeArray[0].getCost();
     }
 
     public void latteSold() {
         totalLatteSold++;
-        totalMoneyEarned += coffeeType.getLatte().getCost();
-        totalMoneyFromLatte += coffeeType.getLatte().getCost();
+        totalMoneyEarned += coffeeTypeArray[1].getCost();
+        totalMoneyFromLatte += coffeeTypeArray[1].getCost();
     }
 
     public void cappuccinoSold() {
         totalCappuccinoSold++;
-        totalMoneyEarned += coffeeType.getCappuccino().getCost();
-        totalMoneyFromCappuccino += coffeeType.getCappuccino().getCost();
+        totalMoneyEarned += coffeeTypeArray[2].getCost();
+        totalMoneyFromCappuccino += coffeeTypeArray[2].getCost();
     }
 
     public void cleanedMachine() {
